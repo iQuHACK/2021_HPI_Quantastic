@@ -27,11 +27,9 @@ def loop(cells, num_stars):
     clock = pygame.time.Clock()
     # -------- Main Program Loop -----------
     if num_stars == 1:
-        status = "You need " + \
-            str(num_stars)+" star per block, row and column"
+        status = "You need {} star per block, row and column".format(num_stars)
     else:
-        status = "You need " + \
-            str(num_stars)+" stars per block, row and column"
+        status = "You need {} stars per block, row and column".format(num_stars)
     text = font.render(status, True, BLACK)
     while carryOn:
         # --- Main event loop
@@ -41,8 +39,10 @@ def loop(cells, num_stars):
                 carryOn = False  # Flag that we are done so we exit this loop
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if mouse[1] < size[1] - button_height:
-                    marked_cells[int(mouse[1] / delta_y)][int(mouse[0] /
-                                                              delta_x)] = (marked_cells[int(mouse[1] / delta_y)][int(mouse[0] / delta_x)] + 1) % 2
+                    cell_y = int(mouse[1] / delta_y)
+                    cell_x = int(mouse[0] / delta_x)
+
+                    marked_cells[cell_y][cell_x] = 0 if marked_cells[cell_y][cell_x] == 1 else 1
                 valid, error = verify_solution(num_stars, cells, marked_cells)
                 if valid:
                     carryOn = False
@@ -54,22 +54,13 @@ def loop(cells, num_stars):
             start_x = 0
             for x, cell in enumerate(row):
                 if marked_cells[y][x] == 1:
-                    pygame.draw.rect(screen, YELLOW, [
-                                     start_x, start_y, delta_x, delta_y])
+                    pygame.draw.rect(screen, YELLOW, [start_x, start_y, delta_x, delta_y])
                 if y >= 1:
-                    if cells[y - 1][x] == cells[y][x]:
-                        pygame.draw.line(screen, BLACK, [start_x, start_y], [
-                                         start_x + delta_x, start_y], 2)
-                    else:
-                        pygame.draw.line(screen, BLACK, [start_x, start_y], [
-                                         start_x+delta_x, start_y], 5)
+                    pygame.draw.line(screen, BLACK, [start_x, start_y],
+                            [start_x + delta_x, start_y], 2 if cells[y-1][x] == cells[y][x] else 5)
                 if x >= 1:
-                    if cells[y][x-1] == cells[y][x]:
-                        pygame.draw.line(screen, BLACK, [start_x, start_y], [
-                                         start_x, start_y+delta_y], 2)
-                    else:
-                        pygame.draw.line(screen, BLACK, [start_x, start_y], [
-                                         start_x, start_y+delta_y], 5)
+                    pygame.draw.line(screen, BLACK, [start_x, start_y],
+                            [start_x, start_y+delta_y], 2 if cells[y][x-1] == cells[y][x] else 5)
                 start_x += delta_x
 
             start_y += delta_y
