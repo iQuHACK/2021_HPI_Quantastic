@@ -54,6 +54,7 @@ def verify_solution(num_stars, cells, solution):
     # Step 1: verify that n stars / row
     for row in solution:
         if sum(row) != num_stars:
+            print("one row has", sum(row), "stars")
             return False
 
     # Step 2: verify that n stars / row
@@ -63,6 +64,7 @@ def verify_solution(num_stars, cells, solution):
             if row[columnID] == 1:
                 total_stars += 1
         if total_stars != num_stars:
+            print("one column has", total_stars, "stars")
             return False
 
     # Step 3: verify that n stars / block
@@ -76,12 +78,14 @@ def verify_solution(num_stars, cells, solution):
 
     for block in stars_per_block:
         if stars_per_block[block] != num_stars:
+            print("block", block, "has", stars_per_block[block], "stars")
             return False
 
     # Step 4: verify that no stars are adjacent
     for y in range(width):
         for x in range(width):
             if solution[y][x] and has_neighboring_star(solution, y, x):
+                print("stars are adjacent at y =", y, "x =", x)
                 return False
 
     return True
@@ -171,9 +175,10 @@ if __name__ == "__main__":
         print()
 
         bqm = build_bqm(cells, num_stars)
-        sampleset = KerberosSampler().sample(bqm, max_iter=10, qpu_params={'label': 'Starbattle'})
+        sampleset = KerberosSampler().sample(bqm)
         solution = sample_to_solution(sampleset.first.sample, len(cells))
 
+        print("checking solution...")
         if verify_solution(num_stars, cells, solution):
             print("found valid solution:")
         else:
