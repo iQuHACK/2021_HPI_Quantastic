@@ -30,14 +30,15 @@ def loop(cells, num_stars):
     # The loop will carry on until the user exit the game (e.g. clicks the close button).
     carryOn = True
     sysfont = pygame.font.get_default_font()
-    font = pygame.font.SysFont(sysfont, 48)
+    font = pygame.font.SysFont(sysfont, round(size[0]/22.5))
     # The clock will be used to control how fast the screen updates
     clock = pygame.time.Clock()
     # -------- Main Program Loop -----------
     if num_stars == 1:
         status = "You need {} star per block, row and column".format(num_stars)
     else:
-        status = "You need {} stars per block, row and column".format(num_stars)
+        status = "You need {} stars per block, row and column".format(
+            num_stars)
     text = font.render(status, True, BLACK)
     valid = False
     while carryOn:
@@ -65,13 +66,14 @@ def loop(cells, num_stars):
             start_x = 0
             for x, cell in enumerate(row):
                 if marked_cells[y][x] == 1:
-                    pygame.draw.rect(screen, YELLOW, [start_x, start_y, delta_x, delta_y])
+                    pygame.draw.rect(screen, YELLOW, [
+                                     start_x, start_y, delta_x, delta_y])
                 if y >= 1:
                     pygame.draw.line(screen, BLACK, [start_x, start_y],
-                            [start_x + delta_x, start_y], 2 if cells[y-1][x] == cells[y][x] else 5)
+                                     [start_x + delta_x, start_y], 2 if cells[y-1][x] == cells[y][x] else 5)
                 if x >= 1:
                     pygame.draw.line(screen, BLACK, [start_x, start_y],
-                            [start_x, start_y+delta_y], 2 if cells[y][x-1] == cells[y][x] else 5)
+                                     [start_x, start_y+delta_y], 2 if cells[y][x-1] == cells[y][x] else 5)
                 start_x += delta_x
 
             start_y += delta_y
@@ -87,7 +89,7 @@ def loop(cells, num_stars):
         # --- Limit to 60 frames per second
         clock.tick(60)
     if valid:
-        screen.fill(WHITE)
+        font = pygame.font.SysFont(sysfont, round(size[0]/11))
         text = font.render("You WON!", True, BLACK)
         text_rect = text.get_rect(center=(size[0] / 2, size[1] / 2))
         screen.blit(text, text_rect)
