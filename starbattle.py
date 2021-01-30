@@ -2,6 +2,7 @@ import dimod
 from dimod.generators.constraints import combinations
 import sys
 
+
 def get_cells(filename):
     """Return a list of lists containing the content of the input text file.
 
@@ -9,17 +10,20 @@ def get_cells(filename):
     the list is from splitting the line of text by the whitespace ' '.
     """
     with open(filename, "r") as f:
-        content = f.readlines()
+        content = f.read().split('\n')
 
     lines = []
+    length = len(content[0])
     for line in content:
         new_line = line.rstrip()    # Strip any whitespace after last value
-
+        if (len(line) != length):   # Ensures that all rows have the same length
+            raise ValueError("Check that all rows have the same length")
         if new_line:
             new_line = list(map(int, new_line.split(' ')))
             lines.append(new_line)
 
     return lines
+
 
 def has_neighboring_star(solution, y, x):
     start_y = 0 if y == 0 else y-1
@@ -34,6 +38,7 @@ def has_neighboring_star(solution, y, x):
                 return True
     return False
 
+
 def verify_solution(n, matrix, solution):
     height = len(matrix)
     width = len(matrix[0])
@@ -42,7 +47,7 @@ def verify_solution(n, matrix, solution):
     for row in solution:
         if sum(row) != n:
             return False
-    
+
     # Step 2: verify that n stars / row
     for columnID in range(width):
         total_stars = 0
