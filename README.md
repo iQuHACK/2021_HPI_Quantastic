@@ -42,8 +42,6 @@ This uses `pygame` to let a user play Star Battle / Two Not Touch interactively.
 
 Part of Team HPI_Quantastic were:
 
-[Jacob Schäfer](https://github.com/jacob271)
-
-[Alexander Sohn](https://github.com/Sohn123)
-
-[Richard Wohlbold](https://github.com/rgwohlbold)
+- [Jacob Schäfer](https://github.com/jacob271)
+- [Alexander Sohn](https://github.com/Sohn123)
+- [Richard Wohlbold](https://github.com/rgwohlbold)
