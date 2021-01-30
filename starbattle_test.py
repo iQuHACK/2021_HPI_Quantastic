@@ -1,10 +1,14 @@
-from starbattle import get_cells, verify_solution
+from starbattle import parse_file, verify_solution
 
 def test_get_cells():
-    filename = "example_cells.txt"
-    cells = get_cells(filename)
-    assert cells == [[0, 0, 1, 1, 1], [0, 0, 1, 2, 2], [
-        3, 3, 1, 2, 2], [3, 3, 3, 2, 4], [3, 3, 4, 4, 4]]
+    filename = "games/beginner/beginner-2.txt"
+    cells, num_stars = parse_file(filename)
+    assert num_stars == 1
+    assert cells == [[0,0,1,1,1],
+                     [0,0,1,2,2],
+                     [3,3,1,2,2],
+                     [3,3,3,2,4],
+                     [3,3,4,4,4]]
 
 def test_verify_simple():
     matrix = [[0]]
