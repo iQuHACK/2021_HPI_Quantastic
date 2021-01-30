@@ -5,26 +5,27 @@ from dimod.generators.constraints import combinations
 from hybrid.reference import KerberosSampler
 from colorama import init, Fore
 
-def get_cells(filename):
+def parse_file(filename):
     """Return a list of lists containing the content of the input text file.
 
     Note: each line of the text file corresponds to a list. Each item in
     the list is from splitting the line of text by the whitespace ' '.
     """
     with open(filename, "r") as f:
-        content = f.read().split('\n')
+        content = f.read().rstrip().split('\n')
 
-    lines = []
-    length = len(content[0])
-    for line in content:
-        new_line = line.rstrip()    # Strip any whitespace after last value
-        if (len(line) != length):   # Ensures that all rows have the same length
-            raise ValueError("Check that all rows have the same length")
-        if new_line:
-            new_line = list(map(int, new_line.split(' ')))
-            lines.append(new_line)
+    num_stars = int(content[0])
+    if num_stars <= 0:
+        raise ValueError("invalid number of stars")
 
-    return lines
+    cells = [ list(map(int, line.split(' '))) for line in content[1:] ]
+
+    if len(set(map(len, cells))) != 1:
+        raise ValueError("rows must have the same length")
+    if len(cells[0]) != len(cells):
+        raise ValueError("board must me quadratic")
+
+    return cells, num_stars
 
 def neighbors(y, x, width):
     start_y = 0 if y == 0 else y-1
@@ -46,12 +47,12 @@ def has_neighboring_star(solution, y, x):
             return True
     return False
 
-def verify_solution(n, cells, solution):
+def verify_solution(num_stars, cells, solution):
     width = len(cells)
 
     # Step 1: verify that n stars / row
     for row in solution:
-        if sum(row) != n:
+        if sum(row) != num_stars:
             return False
 
     # Step 2: verify that n stars / row
@@ -60,7 +61,7 @@ def verify_solution(n, cells, solution):
         for row in solution:
             if row[columnID] == 1:
                 total_stars += 1
-        if total_stars != n:
+        if total_stars != num_stars:
             return False
 
     # Step 3: verify that n stars / block
@@ -73,7 +74,7 @@ def verify_solution(n, cells, solution):
                 stars_per_block[cell] += 1
 
     for block in stars_per_block:
-        if stars_per_block[block] != n:
+        if stars_per_block[block] != num_stars:
             return False
 
     # Step 4: verify that no stars are adjacent
@@ -84,19 +85,19 @@ def verify_solution(n, cells, solution):
 
     return True
 
-def build_bqm(cells, n):
+def build_bqm(cells, num_stars):
     bqm = dimod.BinaryQuadraticModel({}, {}, 0.0, dimod.BINARY)
 
     # constraint 1: n stars per row
     for y, row in enumerate(cells):
         row_labels = [(y,x) for x,_ in enumerate(row)]
-        row_bqm = combinations(row_labels, n)
+        row_bqm = combinations(row_labels, num_stars)
         bqm.update(row_bqm)
 
     # constraint 2: n stars per column
     for x in range(len(cells[0])):
         col_labels = [(y,x) for y in range(len(cells))]
-        col_bqm = combinations(col_labels, n)
+        col_bqm = combinations(col_labels, num_stars)
         bqm.update(col_bqm)
 
     # constraint 3: n stars per block
@@ -106,7 +107,7 @@ def build_bqm(cells, n):
             block_to_labels[cell].append((y,x))
 
     for block in block_to_labels:
-        block_bqm = combinations(block_to_labels[block], n)
+        block_bqm = combinations(block_to_labels[block], num_stars)
         bqm.update(block_bqm)
 
     # constraint 4: no adjacent stars
@@ -164,18 +165,18 @@ if __name__ == "__main__":
               "{} <cells filepath>".format(filename, sys.argv[0]))
 
 
-    cells = get_cells(filename)
+    cells, num_stars = parse_file(filename)
 
     init()
     print("problem:")
     print_cells(cells)
     print()
 
-    bqm = build_bqm(cells, 1)
+    bqm = build_bqm(cells, num_stars)
     sampleset = KerberosSampler().sample(bqm, max_iter=10, qpu_params={'label': 'Starbattle'})
     solution = sample_to_solution(sampleset.first.sample, len(cells))
 
-    if verify_solution(1, cells, solution):
+    if verify_solution(num_stars, cells, solution):
         print("found valid solution:")
     else:
         print("found invalid solution:")
