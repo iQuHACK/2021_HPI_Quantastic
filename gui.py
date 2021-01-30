@@ -31,6 +31,7 @@ def loop(cells, num_stars):
     else:
         status = "You need {} stars per block, row and column".format(num_stars)
     text = font.render(status, True, BLACK)
+    valid = False
     while carryOn:
         # --- Main event loop
         mouse = pygame.mouse.get_pos()
@@ -75,11 +76,12 @@ def loop(cells, num_stars):
 
         # --- Limit to 60 frames per second
         clock.tick(60)
-    screen.fill(WHITE)
-    text = font.render("You WON!", True, BLACK)
-    text_rect = text.get_rect(center=(size[0] / 2, size[1] / 2))
-    screen.blit(text, text_rect)
-    pygame.display.flip()
-    time.sleep(4)
+    if valid:
+        screen.fill(WHITE)
+        text = font.render("You WON!", True, BLACK)
+        text_rect = text.get_rect(center=(size[0] / 2, size[1] / 2))
+        screen.blit(text, text_rect)
+        pygame.display.flip()
+        time.sleep(4)
     # Once we have exited the main program loop we can stop the game engine:
     pygame.quit()
