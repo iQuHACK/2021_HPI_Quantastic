@@ -31,7 +31,7 @@ Usage: `python main.py solve <file>`
 
 This prints a textual representation of the problem and the solution as well as whether the solution is valid:
 
-![textual problem representation](screenshots/output-1.png) ![textual solution representation](screenshots/output-2.png)
+![program output](screenshots/output.png)
 
 ### Play
 Usage: `python main.py play <file>`
