@@ -1,32 +1,7 @@
-import sys
 from collections import defaultdict
-import argparse
 import dimod
 from dwave.system import LeapHybridSampler
 from dimod.generators.constraints import combinations
-from colorama import init, Fore
-
-def parse_file(filename):
-    """Return a list of lists containing the content of the input text file.
-
-    Note: each line of the text file corresponds to a list. Each item in
-    the list is from splitting the line of text by the whitespace ' '.
-    """
-    with open(filename, "r") as f:
-        content = f.read().rstrip().split('\n')
-
-    num_stars = int(content[0])
-    if num_stars <= 0:
-        raise ValueError("invalid number of stars")
-
-    cells = [ list(map(int, line.split(' '))) for line in content[1:] ]
-
-    if len(set(map(len, cells))) != 1:
-        raise ValueError("rows must have the same length")
-    if len(cells[0]) != len(cells):
-        raise ValueError("board must me quadratic")
-
-    return cells, num_stars
 
 def neighbors(y, x, width):
     start_y = 0 if y == 0 else y-1
@@ -128,59 +103,9 @@ def sample_to_solution(sample, width):
         solution[coords[0]][coords[1]] = sample[coords]
     return solution
 
-def print_solution(solution):
-    for row in solution:
-        for cell in row:
-            if cell == 1:
-                print(Fore.YELLOW + "*" + Fore.RESET, end=" ")
-            else:
-                print("- ", end="")
-        print(Fore.RESET)
 
-def print_cells(cells):
-    SYMBOLS = {
-        0: ('/', Fore.RED),
-        1: ('$', Fore.GREEN),
-        2: ('?', Fore.YELLOW),
-        3: ('|', Fore.BLUE),
-        4: ('%', Fore.MAGENTA),
-        5: ('(', Fore.CYAN),
-        6: ('§', Fore.WHITE),
-        7: ('+', Fore.LIGHTRED_EX),
-        8: ('_', Fore.LIGHTGREEN_EX),
-        9: ('&', Fore.LIGHTYELLOW_EX),
-        10: ('~', Fore.LIGHTBLUE_EX),
-        11: ('#', Fore.LIGHTMAGENTA_EX),
-        12: ('^', Fore.LIGHTCYAN_EX),
-        13: ('=', Fore.LIGHTWHITE_EX),
-    }
-    for y,row in enumerate(cells):
-        for x,cell in enumerate(row):
-            print(SYMBOLS[cell][1] + SYMBOLS[cell][0] if cell < len(SYMBOLS) else cell, end=" ")
-        print(Fore.RESET)
+def full_solution(cells, num_stars):
+    bqm = build_bqm(cells, num_stars)
+    sampleset = LeapHybridSampler().sample(bqm, time_limit=5)
+    return sample_to_solution(sampleset.first.sample, len(cells))
 
-if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser(description="solve and play Starbattle / Two Not Touch on D-Wave Leap")
-    parser.add_argument("action", choices=["solve", "play"], help="whether to solve or play the game")
-    parser.add_argument("file", help="game file to load")
-    args = parser.parse_args()
-
-    cells, num_stars = parse_file(args.file)
-
-    if args.action == "solve":
-        init()
-        print("problem:")
-        print_cells(cells)
-        print()
-
-        bqm = build_bqm(cells, num_stars)
-        sampleset = LeapHybridSampler().sample(bqm)
-        solution = sample_to_solution(sampleset.first.sample, len(cells))
-
-        print("checking solution...")
-        if verify_solution(num_stars, cells, solution):
-            print("found valid solution:")
-        else:
-            print("found invalid solution:")
-        print_solution(solution)

@@ -1,4 +1,6 @@
-from starbattle import parse_file, verify_solution
+from main import parse_file
+from starbattle import verify_solution
+
 
 def test_get_cells():
     filename = "games/beginner/beginner-2.txt"
