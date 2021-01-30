@@ -5,10 +5,9 @@ def loop(cells):
     pygame.init()
     size = (1080, 1280)
     screen = pygame.display.set_mode(size)
-    height = len(cells)
-    width = len(cells[0])
+    width = len(cells)
 
-    marked_cells = [[0]*width for _ in range(height)]
+    marked_cells = [[0]*width for _ in range(width)]
     # Define some colors
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
@@ -18,7 +17,7 @@ def loop(cells):
     button_height = 200
 
     width_offset = size[0] / width
-    height_offset = (size[1] - button_height) / height
+    height_offset = (size[1] - button_height) / width
     # Define some colors
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
@@ -50,18 +49,18 @@ def loop(cells):
             for x, cell in enumerate(row):
                 if marked_cells[y][x] == 1:
                     pygame.draw.rect(screen, RED, [
-                                     draw_width, draw_height, draw_width+width_offset, draw_height + height_offset], 0)
+                                     draw_width, draw_height, width_offset, height_offset])
                 else:
                     pygame.draw.rect(screen, WHITE, [
-                                     draw_width, draw_height, draw_width+width_offset, draw_height + height_offset], 0)
-                if y - 1 >= 0:
+                                     draw_width, draw_height, width_offset, height_offset])
+                if y >= 1:
                     if cells[y - 1][x] == cells[y][x]:
                         pygame.draw.line(screen, BLACK, [draw_width, draw_height], [
                                          draw_width + width_offset, draw_height], 1)
                     else:
                         pygame.draw.line(screen, BLACK, [draw_width, draw_height], [
                                          draw_width+width_offset, draw_height], 5)
-                if x - 1 >= 0:
+                if x >= 1:
                     if cells[y][x-1] == cells[y][x]:
                         pygame.draw.line(screen, BLACK, [draw_width, draw_height], [
                                          draw_width, draw_height+height_offset], 1)
