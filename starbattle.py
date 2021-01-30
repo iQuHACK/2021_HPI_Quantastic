@@ -1,7 +1,7 @@
 from collections import defaultdict
-import dimod
-from dwave.system import LeapHybridSampler
+from dimod import BinaryQuadraticModel, BINARY
 from dimod.generators.constraints import combinations
+from dwave.system import LeapHybridSampler
 
 def neighbors(y, x, width):
     start_y = 0 if y == 0 else y-1
@@ -29,8 +29,7 @@ def verify_solution(num_stars, cells, solution):
     # Step 1: verify that n stars / row
     for row in solution:
         if sum(row) != num_stars:
-            print("one row has", sum(row), "stars")
-            return False
+            return False, "one row has {} stars".format(sum(row))
 
     # Step 2: verify that n stars / row
     for columnID in range(width):
@@ -39,8 +38,7 @@ def verify_solution(num_stars, cells, solution):
             if row[columnID] == 1:
                 total_stars += 1
         if total_stars != num_stars:
-            print("one column has", total_stars, "stars")
-            return False
+            return False, "one column has {} stars".format(total_stars)
 
     # Step 3: verify that n stars / block
     stars_per_block = {}
@@ -53,20 +51,18 @@ def verify_solution(num_stars, cells, solution):
 
     for block in stars_per_block:
         if stars_per_block[block] != num_stars:
-            print("block", block, "has", stars_per_block[block], "stars")
-            return False
+            return False, "block {} has {} stars".format(block, stars_per_block[block])
 
     # Step 4: verify that no stars are adjacent
     for y in range(width):
         for x in range(width):
             if solution[y][x] and has_neighboring_star(solution, y, x):
-                print("stars are adjacent at y =", y, "x =", x)
-                return False
+                return False, "stars are adjacent at y={}, x={}".format(y,x)
 
-    return True
+    return True, ""
 
 def build_bqm(cells, num_stars):
-    bqm = dimod.BinaryQuadraticModel({}, {}, 0.0, dimod.BINARY)
+    bqm = BinaryQuadraticModel({}, {}, 0.0, BINARY)
 
     # constraint 1: n stars per row
     for y, row in enumerate(cells):

@@ -42,9 +42,9 @@ def solve_with_output(cells, num_stars):
     print()
 
     solution = full_solution(cells, num_stars)
-    print("checking solution...")
-    if verify_solution(num_stars, cells, solution):
+    res, err = verify_solution(num_stars, cells, solution)
+    if res:
         print("found valid solution:")
     else:
-        print("found invalid solution:")
+        print("found invalid solution because {}:".format(err))
     print_solution(solution)
