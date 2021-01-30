@@ -29,7 +29,9 @@ There are two modes of interaction: the program can either `solve` the specified
 
 Usage: `python main.py solve <file>`
 
-This prints a textual representation of the problem and the solution as well as whether the solution is valid.
+This prints a textual representation of the problem and the solution as well as whether the solution is valid:
+
+![textual problem representation](images/output-1.png) ![textual solution representation](images/output-2.png)
 
 ### Play
 Usage: `python main.py play <file>`
