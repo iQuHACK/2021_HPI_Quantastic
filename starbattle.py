@@ -2,8 +2,8 @@ import sys
 from collections import defaultdict
 import argparse
 import dimod
+from dwave.system import LeapHybridSampler
 from dimod.generators.constraints import combinations
-from hybrid.reference import KerberosSampler
 from colorama import init, Fore
 
 def parse_file(filename):
@@ -95,8 +95,8 @@ def build_bqm(cells, num_stars):
 
     # constraint 1: n stars per row
     for y, row in enumerate(cells):
-        row_labels = [(y,x) for x,_ in enumerate(row)]
-        row_bqm = combinations(row_labels, num_stars)
+        row_coords = [(y,x) for x,_ in enumerate(row)]
+        row_bqm = combinations(row_coords, num_stars)
         bqm.update(row_bqm)
 
     # constraint 2: n stars per column
@@ -175,7 +175,7 @@ if __name__ == "__main__":
         print()
 
         bqm = build_bqm(cells, num_stars)
-        sampleset = KerberosSampler().sample(bqm)
+        sampleset = LeapHybridSampler().sample(bqm)
         solution = sample_to_solution(sampleset.first.sample, len(cells))
 
         print("checking solution...")
