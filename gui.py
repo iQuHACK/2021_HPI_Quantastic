@@ -11,21 +11,16 @@ def loop(cells):
     # Define some colors
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
-    GREEN = (0, 255, 0)
-    RED = (255, 0, 0)
+    YELLOW = (255, 255, 0)
 
     button_height = 200
 
-    width_offset = size[0] / width
-    height_offset = (size[1] - button_height) / width
-    # Define some colors
-    BLACK = (0, 0, 0)
-    WHITE = (255, 255, 255)
-    GREEN = (0, 255, 0)
-    RED = (255, 0, 0)
+    delta_x = size[0] / width
+    delta_y = (size[1] - button_height) / width
     # The loop will carry on until the user exit the game (e.g. clicks the close button).
     carryOn = True
-
+    sysfont = pygame.font.get_default_font()
+    font = pygame.font.SysFont(sysfont, 48)
     # The clock will be used to control how fast the screen updates
     clock = pygame.time.Clock()
 
@@ -40,36 +35,41 @@ def loop(cells):
                 if mouse[1] > size[1] - button_height:
                     pass
                 else:
-                    marked_cells[int(mouse[1] / height_offset)][int(mouse[0] /
-                                                                    width_offset)] = (marked_cells[int(mouse[1] / height_offset)][int(mouse[0] / width_offset)] + 1) % 2
+                    marked_cells[int(mouse[1] / delta_y)][int(mouse[0] /
+                                                              delta_x)] = (marked_cells[int(mouse[1] / delta_y)][int(mouse[0] / delta_x)] + 1) % 2
         screen.fill(WHITE)
-        draw_height = 0
+        start_y = 0
         for y, row in enumerate(cells):
-            draw_width = 0
+            start_x = 0
             for x, cell in enumerate(row):
                 if marked_cells[y][x] == 1:
-                    pygame.draw.rect(screen, RED, [
-                                     draw_width, draw_height, width_offset, height_offset])
+                    pygame.draw.rect(screen, YELLOW, [
+                                     start_x, start_y, delta_x, delta_y])
                 else:
                     pygame.draw.rect(screen, WHITE, [
-                                     draw_width, draw_height, width_offset, height_offset])
+                                     start_x, start_y, delta_x, delta_y])
                 if y >= 1:
                     if cells[y - 1][x] == cells[y][x]:
-                        pygame.draw.line(screen, BLACK, [draw_width, draw_height], [
-                                         draw_width + width_offset, draw_height], 1)
+                        pygame.draw.line(screen, BLACK, [start_x, start_y], [
+                                         start_x + delta_x, start_y], 1)
                     else:
-                        pygame.draw.line(screen, BLACK, [draw_width, draw_height], [
-                                         draw_width+width_offset, draw_height], 5)
+                        pygame.draw.line(screen, BLACK, [start_x, start_y], [
+                                         start_x+delta_x, start_y], 5)
                 if x >= 1:
                     if cells[y][x-1] == cells[y][x]:
-                        pygame.draw.line(screen, BLACK, [draw_width, draw_height], [
-                                         draw_width, draw_height+height_offset], 1)
+                        pygame.draw.line(screen, BLACK, [start_x, start_y], [
+                                         start_x, start_y+delta_y], 1)
                     else:
-                        pygame.draw.line(screen, BLACK, [draw_width, draw_height], [
-                                         draw_width, draw_height+height_offset], 5)
-                draw_width = draw_width+width_offset
+                        pygame.draw.line(screen, BLACK, [start_x, start_y], [
+                                         start_x, start_y+delta_y], 5)
+                start_x += delta_x
 
-            draw_height = draw_height + height_offset
+            start_y += delta_y
+        text = font.render("Validate solution", True, BLACK)
+        text_rect = text.get_rect(
+            center=(size[0]/2, size[1]-(button_height/2)))
+        screen.blit(text, text_rect)
+
         pygame.draw.rect(
             screen, BLACK, [0, size[1]-button_height, size[0], size[1]], width=3)
         pygame.display.flip()
