@@ -1,5 +1,6 @@
 import sys
 from collections import defaultdict
+import argparse
 import dimod
 from dimod.generators.constraints import combinations
 from hybrid.reference import KerberosSampler
@@ -156,28 +157,25 @@ def print_cells(cells):
 
 if __name__ == "__main__":
 
-    # Read user input
-    if len(sys.argv) > 1:
-        filename = sys.argv[1]
-    else:
-        filename = "example_cells.txt"
-        print("Warning: using default problem file, '{}'. Usage: python "
-              "{} <cells filepath>".format(filename, sys.argv[0]))
+    parser = argparse.ArgumentParser(description="solve and play Starbattle / Two Not Touch on D-Wave Leap")
+    parser.add_argument("action", choices=["solve", "play"], help="whether to solve or play the game")
+    parser.add_argument("file", help="game file to load")
+    args = parser.parse_args()
 
+    cells, num_stars = parse_file(args.file)
 
-    cells, num_stars = parse_file(filename)
+    if args.action == "solve":
+        init()
+        print("problem:")
+        print_cells(cells)
+        print()
 
-    init()
-    print("problem:")
-    print_cells(cells)
-    print()
+        bqm = build_bqm(cells, num_stars)
+        sampleset = KerberosSampler().sample(bqm, max_iter=10, qpu_params={'label': 'Starbattle'})
+        solution = sample_to_solution(sampleset.first.sample, len(cells))
 
-    bqm = build_bqm(cells, num_stars)
-    sampleset = KerberosSampler().sample(bqm, max_iter=10, qpu_params={'label': 'Starbattle'})
-    solution = sample_to_solution(sampleset.first.sample, len(cells))
-
-    if verify_solution(num_stars, cells, solution):
-        print("found valid solution:")
-    else:
-        print("found invalid solution:")
-    print_solution(solution)
+        if verify_solution(num_stars, cells, solution):
+            print("found valid solution:")
+        else:
+            print("found invalid solution:")
+        print_solution(solution)
