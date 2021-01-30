@@ -1,9 +1,17 @@
 import pygame
 import time
-from starbattle import verify_solution
+from starbattle import full_solution, verify_solution
+from queue import Queue
+from threading import Thread
 
+def full_solve_queue(q, cells, num_stars):
+    q.put(full_solution(cells, num_stars))
 
 def loop(cells, num_stars):
+
+    q = Queue()
+    thread = Thread(target=full_solve_queue, args=(q, cells, num_stars))
+    thread.start()
     pygame.init()
     size = (1080, 1280)
     screen = pygame.display.set_mode(size)
@@ -49,6 +57,8 @@ def loop(cells, num_stars):
                     carryOn = False
                 else:
                     text = font.render(error, True, BLACK)
+        if q.qsize() > 0:
+            print("solution available, it's", q.get())
         screen.fill(WHITE)
         start_y = 0
         for y, row in enumerate(cells):
