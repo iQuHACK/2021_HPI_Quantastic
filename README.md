@@ -1,15 +1,13 @@
-# Welcome to iQuHACK 2021!
-Check out some info in the [event's repository](https://github.com/iQuHACK/2021) to get started.
+# Welcome to the Repository of Team12 at iQuHACK 2021!
+ Our goal is to implement a solver for the gam star battle / to not touch.
 
-Having a README in your team's repository facilitates judging. A good README contains:
-* a clear title for your project,
-* a short abstract,
-* the motivation/goals for your project,
-* a description of the work you did, and
-* proposals for future work.
+ Therefore we use the ocean sdk from dwavesys
 
-You can find a potential README template in [one of last year's projects](https://github.com/iQuHACK/QuhacMan).
+ ## Usage
 
-Feel free to contact the staff with questions over our [event's slack](https://iquhack.slack.com), or via iquhack@mit.edu.
+ `python starbattle.py <cells filepath>`
 
-Good luck!
+ The Cells filepath, is the field which should be solved. All Cells that belong to the same block share the same number. You can find an example at example_cells.txt
+
+
+
