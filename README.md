@@ -1,5 +1,7 @@
 # HPI_Quantastic: Star Battle / Two Not Touch
 
+You can find our project presentation slides [here](iquhack2021_hpi_quantastic.pdf). 
+
 ## About the game
 This repository implements the popular game created by [Krazydad](https://krazydad.com/twonottouch/) and solves it using D-Wave's Quantum Annealing. We use the [Ocean SDK](https://docs.ocean.dwavesys.com/en/stable/) provided by D-Wave.
 
