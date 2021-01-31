@@ -4,6 +4,15 @@ from starbattle import full_solution, verify_solution
 from queue import Queue
 from threading import Thread
 
+STATE_PLAYING = 0
+STATE_PLAYING_QPU_VALID = 1
+STATE_PLAYING_QPU_INVALID = 2
+STATE_WON_BEFORE_QPU = 3
+STATE_WON_QPU_VALID = 4
+STATE_WON_QPU_INVALID = 5
+STATE_SHOW_SOLUTION = 6
+STATE_END = 7
+
 # Define some colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -15,6 +24,8 @@ RED = (255, 17,0)
 
 # Define the size of the Player window
 size = [500, 500]
+
+FPS = 60
 
 # Calculate the height of the info box and the button at the bottom
 info_height = round(size[1] / 10)
@@ -46,7 +57,7 @@ def draw_board(screen, cells, marked_cells, show_solution, solution, delta_x, de
     start_y = info_height
     for y, row in enumerate(cells):
         start_x = 0
-        for x, cell in enumerate(row):
+        for x, _ in enumerate(row):
             if show_solution and solution[y][x] == 1:
                 pygame.draw.rect(screen, GREEN, [
                                  start_x, start_y, delta_x, delta_y])
@@ -65,39 +76,29 @@ def draw_board(screen, cells, marked_cells, show_solution, solution, delta_x, de
             start_x += delta_x
         start_y += delta_y
 
-def draw_results(screen, user_time, qpu_time, valid, found_solution):
+def draw_results(screen, qpu_info, your_time, result_text):
     font_size = round(size[1]/20)
     sysfont = pygame.font.get_default_font()
     font = pygame.font.SysFont(sysfont, font_size)
 
-    if found_solution:
-        qpu_text = font.render("QPU time: " + qpu_time + "s", True, BLACK)
-    else:
+    
         qpu_text = font.render("QPU didn't finish", True, BLACK)
 
-    if valid:
-        pygame.draw.rect(
-           screen, WHITE, [size[0]/4, size[1]/2 - 1.5 * font_size, size[0]/2, font_size*3])
-        pygame.draw.rect(
-           screen, BLACK, [size[0]/4, size[1]/2 - 1.5 * font_size, size[0]/2, font_size*3], 5)
-        your_text = font.render("Your time: " + user_time + "s", True, BLACK)
-        text_rect_your_time = your_text.get_rect(center=(size[0] / 2, size[1] / 2 ))
-        screen.blit(your_text, text_rect_your_time)
+    pygame.draw.rect(
+        screen, WHITE, [size[0]/4, size[1]/2 - 1.5 * font_size, size[0]/2, font_size*3])
+    pygame.draw.rect(
+        screen, BLACK, [size[0]/4, size[1]/2 - 1.5 * font_size, size[0]/2, font_size*3], 5)
+    your_text = font.render("Your time: " + user_time + "s", True, BLACK)
+    text_rect_your_time = your_text.get_rect(center=(size[0] / 2, size[1] / 2 ))
+    screen.blit(your_text, text_rect_your_time)
 
-        text_rect_qpu_time = qpu_text.get_rect(center=(size[0] / 2, size[1] / 2 + font_size))
-        screen.blit(qpu_text, text_rect_qpu_time)
-        result_text = "You WON!"
-        win_text = font.render(result_text, True, BLACK)
+    text_rect_qpu_time = qpu_text.get_rect(center=(size[0] / 2, size[1] / 2 + font_size))
+    screen.blit(qpu_text, text_rect_qpu_time)
+    result_text = "You WON!"
+    win_text = font.render(result_text, True, BLACK)
 
-        text_rect_you_won = win_text.get_rect(center=(size[0] / 2, size[1] / 2 + -1 * font_size))
-        screen.blit(win_text, text_rect_you_won)
-        pygame.display.flip()
-    else:
-        draw_button(screen, GREY)
-        text_rect = qpu_text.get_rect(
-        center=(size[0]/4*3, size[1]-(button_height/2)))
-        screen.blit(qpu_text, text_rect)
-        pygame.display.flip()
+    text_rect_you_won = win_text.get_rect(center=(size[0] / 2, size[1] / 2 + -1 * font_size))
+    screen.blit(win_text, text_rect_you_won)
 
 def draw_button(screen, button_color):
     pygame.draw.rect(
@@ -109,7 +110,7 @@ def loop(cells, num_stars):
     cells: The original cells with the information about the blocks
     num_stars: The number of stars the player has to mark in every block, column and row
     """
-    
+    state = STATE_PLAYING
     start = time.time()
     qpu_end = time.time()
     user_end = time.time()
@@ -127,11 +128,8 @@ def loop(cells, num_stars):
     delta_x = size[0] / width
     delta_y = (size[1] - button_height - info_height) / width
     # The loop will carry on until the user exit the game (e.g. clicks the close button).
-    carry_on = True
     sysfont = pygame.font.get_default_font()
     font = pygame.font.SysFont(sysfont, round(size[1]/22.5))
-    found_solution = False
-    show_solution = False
     # The clock will be used to control how fast the screen updates
     clock = pygame.time.Clock()
     if num_stars == 1:
@@ -143,41 +141,51 @@ def loop(cells, num_stars):
     info_rect = info_text.get_rect(center=(size[0]/2, info_height / 2))
     error_text = font.render("", True, BLACK)
     solution = []
-    qpu_valid = False
-    valid = False
-    running = True
-    while carry_on:
+    while True:
         # --- Main event loop
         mouse = pygame.mouse.get_pos()
         for event in pygame.event.get():  # User did something
             if event.type == pygame.QUIT:  # If user clicked close
-                carry_on = False  # Flag that we are done so we exit this loop
+                state = STATE_END  # Flag that we are done so we exit this loop
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if mouse[1] < size[1] - button_height and mouse[1] > info_height and running:
+                if mouse[1] < size[1] - button_height and mouse[1] > info_height and state <= STATE_PLAYING_QPU_INVALID:
                     cell_y = int((mouse[1] - info_height) / delta_y)
                     cell_x = int(mouse[0] / delta_x)
 
                     marked_cells[cell_y][cell_x] = 0 if marked_cells[cell_y][cell_x] == 1 else 1
-                valid, error = verify_solution(num_stars, cells, marked_cells)
-                if valid and running:
-                    running = False
-                    user_end = time.time()
-                else:
-                    error_text = font.render(error, True, BLACK)
-                if mouse[0] >= size[0]/2 and mouse[1] >= size[1]-button_height and found_solution:
-                    show_solution = True
+                    valid, error = verify_solution(num_stars, cells, marked_cells)
+                    if valid:
+                        if state == STATE_PLAYING:
+                            state = STATE_WON_BEFORE_QPU
+                        elif state == STATE_PLAYING_QPU_VALID:
+                            state = STATE_WON_QPU_VALID
+                        elif state == STATE_PLAYING_QPU_INVALID:
+                            state = STATE_WON_QPU_INVALID
+                        user_end = time.time()
+                    else:
+                        error_text = font.render(error, True, BLACK)
+                if mouse[0] >= size[0]/2 and mouse[1] >= size[1]-button_height and state == STATE_PLAYING_QPU_VALID:
+                    state = STATE_SHOW_SOLUTION
             
+        if state == STATE_END:
+            break
 
         if q.qsize() > 0:
             solution = q.get()
-            found_solution = True
             qpu_valid, _ = verify_solution(num_stars, cells, solution)
+            if qpu_valid:
+                if state == STATE_PLAYING:
+                    state = STATE_PLAYING_QPU_VALID
+                elif state == STATE_WON_BEFORE_QPU:
+                    state = STATE_WON_QPU_VALID
+            else:
+                if state == STATE_PLAYING:
+                    state = STATE_PLAYING_QPU_INVALID
+                elif state == STATE_WON_BEFORE_QPU:
+                    state = STATE_WON_QPU_INVALID
             qpu_end = time.time()
-            print("solution available, it's", solution)
 
-
-        draw_board(screen, cells, marked_cells,
-                   show_solution, solution, delta_x, delta_y)
+        draw_board(screen, cells, marked_cells, state == STATE_SHOW_SOLUTION or state == STATE_WON_QPU_VALID, solution, delta_x, delta_y)
         text_rect = error_text.get_rect(
             center=(size[0]/4, size[1]-(button_height/2)))
         screen.blit(error_text, text_rect)
@@ -185,23 +193,26 @@ def loop(cells, num_stars):
                          size[0], info_height])
         screen.blit(info_text, info_rect)
 
-
-        button_color = GREY
-        if mouse[0] >= size[0]/2 and mouse[1] >= size[1]-button_height and found_solution and qpu_valid:
-            button_color = GREEN
-        elif found_solution and qpu_valid:
+        
+        if state == STATE_PLAYING_QPU_VALID:
             button_color = DARKGREEN
-        elif found_solution:
-            button_color = RED   
-        draw_button(screen, button_color)
-
-        solution_text = ""
-        if found_solution and qpu_valid:
-            solution_text = font.render("Show Solution", True, BLACK)
-        elif found_solution:
+            if mouse[0] >= size[0]/2 and mouse[1] >= size[1]-button_height:
+                button_color = GREEN     
+            solution_text = font.render("Show Solution", True, BLACK)       
+        elif state == STATE_PLAYING_QPU_INVALID or state == STATE_WON_QPU_INVALID:
+            button_color = RED
             solution_text = font.render("QPU failed", True, BLACK)
-        else:
+        elif state == STATE_PLAYING or state == STATE_WON_BEFORE_QPU:
             solution_text = font.render("QPU is running", True, BLACK)
+            button_color = GREY
+        elif state == STATE_SHOW_SOLUTION:
+            button_color = GREY
+            solution_text = font.render("QPU Time: {}".format(round(qpu_end - start, 2)), True, BLACK)
+        else:
+            button_color = GREY
+            solution_text = font.render("", True, BLACK)
+
+        draw_button(screen, button_color)
 
         text_rect = solution_text.get_rect(
             center=(size[0]/4*3, size[1]-(button_height/2)))
@@ -210,15 +221,19 @@ def loop(cells, num_stars):
         pygame.draw.rect(
             screen, BLACK, [0, size[1]-button_height, size[0], size[1]], width=3)        
 
-        if show_solution or valid:
-            draw_results(screen, str(round(user_end - start, 2)), str(round(qpu_end - start, 2)),valid, found_solution)
+        if state == STATE_WON_BEFORE_QPU:
+            draw_results(screen, "QPU didn't finish")
+        elif state == STATE_WON_QPU_VALID:
+
+        elif state == STATE_WON_QPU_INVALID:
+            if state == STATE_WON_QPU_VALID or STATE_WON_QPU_INVALID:
+                qpu_text = font.render("QPU time: " + qpu_time + "s", True, BLACK)
+            elif state == STATE_WON_BEFORE_QPU:
+
+            draw_results(screen, str(round(user_end - start, 2)), str(round(qpu_end - start, 2)), state)
         pygame.display.flip()
 
-        # --- Limit to 60 frames per second
-        clock.tick(60)
+        clock.tick(FPS)
 
-    
-    
-    
     # Once we have exited the main program loop we can stop the game engine:
     pygame.quit()
