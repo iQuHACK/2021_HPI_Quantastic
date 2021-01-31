@@ -16,9 +16,11 @@ RED = (255, 17,0)
 # Define the size of the Player window
 size = [500, 500]
 
+# Calculate the height of the info box and the button at the bottom
 info_height = round(size[1] / 10)
 button_height = round(size[1] / 5)
 
+# Update the height accordingly
 size[1] += info_height + button_height
 
 size = tuple(size)
@@ -29,6 +31,14 @@ def full_solve_queue(q, cells, num_stars):
 
 
 def draw_board(screen, cells, marked_cells, show_solution, solution, delta_x, delta_y):
+    """ Draws a board to the screen. It takes the following parameters:
+    screen: The screen the board should be drawn to
+    cells: The original cells, with the information about the blocks
+    marked_cells: The Cells marked by the user
+    show_solution: Bool if the user wants the solution to be displayed
+    delta_y: height of a cell
+    delta_x: width of a cell
+    """
     screen.fill(WHITE)
     sysfont = pygame.font.get_default_font()
     plus_font = pygame.font.SysFont(sysfont, round(size[1]/7))
@@ -95,10 +105,15 @@ def draw_button(screen, button_color):
 
 
 def loop(cells, num_stars):
-
+    """ This loop draws a gui, specified by cells and num_stars
+    cells: The original cells with the information about the blocks
+    num_stars: The number of stars the player has to mark in every block, column and row
+    """
+    
     start = time.time()
     qpu_end = time.time()
     user_end = time.time()
+    
     q = Queue()
     thread = Thread(target=full_solve_queue, args=(q, cells, num_stars))
     thread.start()
