@@ -9,6 +9,8 @@ BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 YELLOW = (255, 255, 0)
 GREEN = (0, 255, 0)
+DARKGREEN = (0, 200, 0)
+GREY = (200, 200, 200)
 
 # Define the size of the Player window
 size = [500, 500]
@@ -71,6 +73,7 @@ def loop(cells, num_stars):
     carry_on = True
     sysfont = pygame.font.get_default_font()
     font = pygame.font.SysFont(sysfont, round(size[1]/22.5))
+    found_solution = False
     show_solution = False
     # The clock will be used to control how fast the screen updates
     clock = pygame.time.Clock()
@@ -101,9 +104,13 @@ def loop(cells, num_stars):
                     carry_on = False
                 else:
                     error_text = font.render(error, True, BLACK)
+
+                if mouse[0] >= size[0]/2 and mouse[1] >= size[1]-button_height and found_solution:
+                    show_solution = True
+
         if q.qsize() > 0:
             solution = q.get()
-            show_solution = True
+            found_solution = True
             print("solution available, it's", solution)
 
         draw_board(screen, cells, marked_cells,
@@ -114,8 +121,35 @@ def loop(cells, num_stars):
         pygame.draw.line(screen, BLACK, [0, info_height], [
                          size[0], info_height])
         screen.blit(info_text, info_rect)
+        text_rect = win_text.get_rect(
+            center=(size[0]/4, size[1]-(button_height/2)))
+        screen.blit(win_text, text_rect)
+
+
+        button_color = GREY
+        if mouse[0] >= size[0]/2 and mouse[1] >= size[1]-button_height and found_solution:
+            button_color = GREEN
+        elif found_solution:
+            button_color = DARKGREEN
+        
         pygame.draw.rect(
-            screen, BLACK, [0, size[1]-button_height, size[0], size[1]], width=3)
+                screen, button_color, [size[0]/2, size[1]-button_height, size[0]/2, button_height])
+
+        solution_text = ""
+        if found_solution:
+            solution_text = font.render("Show Solution", True, BLACK)
+        else:
+            solution_text = font.render("QPU is running", True, BLACK)
+
+        text_rect = solution_text.get_rect(
+            center=(size[0]/4*3, size[1]-(button_height/2)))
+        screen.blit(solution_text, text_rect)
+
+        pygame.draw.rect(
+            screen, BLACK, [0, size[1]-button_height, size[0], size[1]], width=3)        
+
+        
+
         pygame.display.flip()
 
         # --- Limit to 60 frames per second
