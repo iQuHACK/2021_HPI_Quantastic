@@ -23,7 +23,7 @@ GREY = (200, 200, 200)
 RED = (255, 17, 0)
 
 # Define the size of the Player window
-size = [500, 500]
+size = [800, 800]
 
 FPS = 60
 
@@ -226,7 +226,7 @@ def loop(cells, num_stars):
             draw_button(screen, GREY, "QPU Time: {}".format(
                 round(qpu_end - start, 2)), font)
         else:
-            draw_button(screen, GREY, "", font)
+            draw_button(screen, WHITE, "", font)
 
         pygame.draw.rect(
             screen, BLACK, [0, size[1]-button_height, size[0], size[1]], width=3)
@@ -238,8 +238,8 @@ def loop(cells, num_stars):
             draw_results(screen, "QPU time: {}s".format(round(qpu_end-start, 2)),
                          "Your time: {}s".format(round(user_end-start, 2)), "You WON!")
         elif state == STATE_WON_QPU_INVALID:
-            draw_results(screen, "QPU failed!", "Your time {}s".format(
-                user_end - start), "You WON!")
+            draw_results(screen, "QPU failed!", "Your time: {}s".format(round(
+                user_end - start, 2)), "You WON!")
 
         # Update display
         pygame.display.flip()
