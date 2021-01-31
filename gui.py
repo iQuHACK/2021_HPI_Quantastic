@@ -218,12 +218,11 @@ def loop(cells, num_stars):
                 button_color = GREEN
             draw_button(screen, button_color, "Show solution", font)
         elif state == STATE_PLAYING_QPU_INVALID or state == STATE_WON_QPU_INVALID:
-
-            draw_button(screen, RED, "QPU failed", font)
+            draw_button(screen, RED, "QPU solution invalid", font)
         elif state == STATE_PLAYING or state == STATE_WON_BEFORE_QPU:
-            draw_button(screen, GREY, "QPU is running", font)
+            draw_button(screen, GREY, "QPU still running", font)
         elif state == STATE_SHOW_SOLUTION:
-            draw_button(screen, GREY, "QPU Time: {}".format(
+            draw_button(screen, GREY, "QPU time: {}s".format(
                 round(qpu_end - start, 2)), font)
         else:
             draw_button(screen, WHITE, "", font)
@@ -232,13 +231,13 @@ def loop(cells, num_stars):
             screen, BLACK, [0, size[1]-button_height, size[0], size[1]], width=3)
 
         if state == STATE_WON_BEFORE_QPU:
-            draw_results(screen, "QPU didn't finish",
+            draw_results(screen, "QPU still running",
                          "Your time: {}s".format(round(user_end-start, 2)), "You WON!")
         elif state == STATE_WON_QPU_VALID:
             draw_results(screen, "QPU time: {}s".format(round(qpu_end-start, 2)),
                          "Your time: {}s".format(round(user_end-start, 2)), "You WON!")
         elif state == STATE_WON_QPU_INVALID:
-            draw_results(screen, "QPU failed!", "Your time: {}s".format(round(
+            draw_results(screen, "QPU solution invalid", "Your time: {}s".format(round(
                 user_end - start, 2)), "You WON!")
 
         # Update display
