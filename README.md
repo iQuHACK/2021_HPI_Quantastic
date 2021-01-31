@@ -5,6 +5,9 @@ This repository implements the popular game created by [Krazydad](https://krazyd
 
 To get a feel for the game, you can try it out online [https://www.puzzle-star-battle.com/](here).
 
+## Goals
+The project should educate players on the power of quantum computing. While human players try one combination after the other, the quantum computer tries all combinations at the same time. This approach is also vastly different from classical computers which take a long time to solve this kind of puzzle.
+
 ## Modelling the game
 The board is always quadratic and is divided into _blocks_. We represent each block with a unique number. Therefore, we represent a Star Battle / Two Not Touch puzzle as a square matrix that contains the block number of each cell as well as a number specifying how many stars each row / column / block should contain. We have taken a few sample puzzles of varying difficulty from Krazydad's online books that can be used with the program.
 
