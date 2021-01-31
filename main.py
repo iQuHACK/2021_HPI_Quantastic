@@ -2,11 +2,6 @@ import argparse
 
 
 def parse_file(filename):
-    """Return a list of lists containing the content of the input text file.
-
-    Note: each line of the text file corresponds to a list. Each item in
-    the list is from splitting the line of text by the whitespace ' '.
-    """
     with open(filename, "r") as f:
         content = f.read().rstrip().split('\n')
 
