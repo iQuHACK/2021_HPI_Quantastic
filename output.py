@@ -30,7 +30,8 @@ def print_solution(cells, solution):
                 print(SYMBOLS[cells[y][x]][1] + "- " if cells[y][x] < len(SYMBOLS) else Fore.RESET + "- ", end="")
         print(Fore.RESET)
 
-def print_cells(cells):
+def print_puzzle(cells, num_stars):
+    print("puzzle ({}☆):".format(num_stars))
     for y,row in enumerate(cells):
         for x,cell in enumerate(row):
             print(SYMBOLS[cell][1] + SYMBOLS[cell][0] if cell < len(SYMBOLS) else cell, end=" ")
@@ -38,9 +39,7 @@ def print_cells(cells):
 
 def solve_with_output(cells, num_stars):
     init()
-    print("problem:")
-    print_cells(cells)
-    print()
+    print_puzzle(cells, num_stars)
 
     solution = full_solution(cells, num_stars)
     res, err = verify_solution(num_stars, cells, solution)
