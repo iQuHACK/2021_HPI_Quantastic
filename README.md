@@ -57,7 +57,7 @@ If you were able to solve the puzzle, and the `LeapHybridSampler` returned a val
 
 ## Contributors
 
-Part of Team HPI_Quantastic were:
+Part of the team HPI_Quantastic were:
 
 - [Jacob Schäfer](https://github.com/jacob271)
 - [Alexander Sohn](https://github.com/Sohn123)
