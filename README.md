@@ -45,11 +45,11 @@ Usage: `python main.py play <file>`
 
 This uses `pygame` to let a user play Star Battle / Two Not Touch interactively. It also times the user against `LeapHybridSampler`.
 
-If you're only interested in the solution of the field, you can select show solution, after the `LeapHybridSampler` returned a solution. In the lower left corner you also get information about errors in the cells you marked.
+If you're only interested in the solution of the field, you can select _Show Solution_, after the `LeapHybridSampler` returned a solution. In the lower left corner you also get information why your solution is invalid:
 
 ![gui output](screenshots/gui_not_solved.png)
 
-If you were able to solve the puzzle, and the `LeapHybridSampler` returned a valid result, the GUI shows the time it took you to solve the puzzle and the time for the `LeapHybridSampler`
+If you were able to solve the puzzle, and the `LeapHybridSampler` returned a valid result, the GUI shows the time it took you to solve the puzzle and the time for the `LeapHybridSampler`:
 
 ![gui output](screenshots/gui_solved.png)
 
