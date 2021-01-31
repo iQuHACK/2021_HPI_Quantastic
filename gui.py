@@ -232,13 +232,13 @@ def loop(cells, num_stars):
 
         if state == STATE_WON_BEFORE_QPU:
             draw_results(screen, "QPU still running",
-                         "Your time: {}s".format(round(user_end-start, 2)), "You WON!")
+                         "Your time: {}s".format(round(user_end-start, 2)), "You won!")
         elif state == STATE_WON_QPU_VALID:
             draw_results(screen, "QPU time: {}s".format(round(qpu_end-start, 2)),
-                         "Your time: {}s".format(round(user_end-start, 2)), "You WON!")
+                         "Your time: {}s".format(round(user_end-start, 2)), "You won!")
         elif state == STATE_WON_QPU_INVALID:
             draw_results(screen, "QPU solution invalid", "Your time: {}s".format(round(
-                user_end - start, 2)), "You WON!")
+                user_end - start, 2)), "You won!")
 
         # Update display
         pygame.display.flip()
