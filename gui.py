@@ -4,15 +4,21 @@ from starbattle import full_solution, verify_solution
 from queue import Queue
 from threading import Thread
 
+# Define some colors
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 YELLOW = (255, 255, 0)
 GREEN = (0, 255, 0)
 
-size = (1080, 1380)
+# Define the size of the Player window
+size = [500, 500]
 
-info_height = 100
-button_height = 200
+info_height = round(size[1] / 10)
+button_height = round(size[1] / 5)
+
+size[1] += info_height + button_height
+
+size = tuple(size)
 
 
 def full_solve_queue(q, cells, num_stars):
@@ -22,7 +28,7 @@ def full_solve_queue(q, cells, num_stars):
 def draw_board(screen, cells, marked_cells, show_solution, solution, delta_x, delta_y):
     screen.fill(WHITE)
     sysfont = pygame.font.get_default_font()
-    plus_font = pygame.font.SysFont(sysfont, round(size[0]/7))
+    plus_font = pygame.font.SysFont(sysfont, round(size[1]/7))
     mark = plus_font.render("+", True, BLACK)
     start_y = info_height
     for y, row in enumerate(cells):
@@ -59,14 +65,12 @@ def loop(cells, num_stars):
     marked_cells = [[0]*width for _ in range(width)]
     solution = [[0]*width for _ in range(width)]
 
-    # Define some colors
-
     delta_x = size[0] / width
     delta_y = (size[1] - button_height - info_height) / width
     # The loop will carry on until the user exit the game (e.g. clicks the close button).
     carry_on = True
     sysfont = pygame.font.get_default_font()
-    font = pygame.font.SysFont(sysfont, round(size[0]/22.5))
+    font = pygame.font.SysFont(sysfont, round(size[1]/22.5))
     show_solution = False
     # The clock will be used to control how fast the screen updates
     clock = pygame.time.Clock()
@@ -117,7 +121,7 @@ def loop(cells, num_stars):
         # --- Limit to 60 frames per second
         clock.tick(60)
     if valid:
-        font = pygame.font.SysFont(sysfont, round(size[0]/11))
+        font = pygame.font.SysFont(sysfont, round(size[1]/11))
         win_text = font.render("You WON!", True, BLACK)
         text_rect = win_text.get_rect(center=(size[0] / 2, size[1] / 2))
         screen.blit(win_text, text_rect)
