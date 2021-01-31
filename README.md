@@ -21,6 +21,10 @@ We use [`dimod.generators.constraints.combinations`](https://docs.ocean.dwavesys
 
 As our sampler, we use [`LeapHybridSampler`](https://docs.ocean.dwavesys.com/projects/system/en/stable/reference/samplers.html#leaphybridsampler).
 
+## Installation
+
+For installation, run `pip install -r requirements.txt`. The `LeapHybridSampler` requires a Leap API token to be configured. For more information, consult the [Ocean installation guide](https://docs.ocean.dwavesys.com/en/stable/overview/install.html).
+
 ## Usage
 
 There are two modes of interaction: the program can either `solve` the specified puzzle or you can `play` interactively against the quantum computer.
