@@ -1,5 +1,5 @@
+#!/usr/bin/python3
 import argparse
-
 
 def parse_file(filename):
     with open(filename, "r") as f:
