@@ -9,7 +9,10 @@ WHITE = (255, 255, 255)
 YELLOW = (255, 255, 0)
 GREEN = (0, 255, 0)
 
-size = (1080, 1280)
+size = (1080, 1380)
+
+info_height = 100
+button_height = 200
 
 
 def full_solve_queue(q, cells, num_stars):
@@ -21,7 +24,7 @@ def draw_board(screen, cells, marked_cells, show_solution, solution, delta_x, de
     sysfont = pygame.font.get_default_font()
     plus_font = pygame.font.SysFont(sysfont, round(size[0]/7))
     mark = plus_font.render("+", True, BLACK)
-    start_y = 0
+    start_y = info_height
     for y, row in enumerate(cells):
         start_x = 0
         for x, cell in enumerate(row):
@@ -58,10 +61,8 @@ def loop(cells, num_stars):
 
     # Define some colors
 
-    button_height = 200
-
     delta_x = size[0] / width
-    delta_y = (size[1] - button_height) / width
+    delta_y = (size[1] - button_height - info_height) / width
     # The loop will carry on until the user exit the game (e.g. clicks the close button).
     carry_on = True
     sysfont = pygame.font.get_default_font()
@@ -69,13 +70,14 @@ def loop(cells, num_stars):
     show_solution = False
     # The clock will be used to control how fast the screen updates
     clock = pygame.time.Clock()
-    # -------- Main Program Loop -----------
     if num_stars == 1:
         status = "You need {} star per block, row and column".format(num_stars)
     else:
         status = "You need {} stars per block, row and column".format(
             num_stars)
-    win_text = font.render(status, True, BLACK)
+    info_text = font.render(status, True, BLACK)
+    info_rect = info_text.get_rect(center=(size[0]/2, info_height / 2))
+    error_text = font.render("", True, BLACK)
     solution = []
     valid = False
     while carry_on:
@@ -85,8 +87,8 @@ def loop(cells, num_stars):
             if event.type == pygame.QUIT:  # If user clicked close
                 carry_on = False  # Flag that we are done so we exit this loop
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if mouse[1] < size[1] - button_height:
-                    cell_y = int(mouse[1] / delta_y)
+                if mouse[1] < size[1] - button_height and mouse[1] > info_height:
+                    cell_y = int((mouse[1] - info_height) / delta_y)
                     cell_x = int(mouse[0] / delta_x)
 
                     marked_cells[cell_y][cell_x] = 0 if marked_cells[cell_y][cell_x] == 1 else 1
@@ -94,7 +96,7 @@ def loop(cells, num_stars):
                 if valid:
                     carry_on = False
                 else:
-                    win_text = font.render(error, True, BLACK)
+                    error_text = font.render(error, True, BLACK)
         if q.qsize() > 0:
             solution = q.get()
             show_solution = True
@@ -102,10 +104,12 @@ def loop(cells, num_stars):
 
         draw_board(screen, cells, marked_cells,
                    show_solution, solution, delta_x, delta_y)
-        text_rect = win_text.get_rect(
+        text_rect = error_text.get_rect(
             center=(size[0]/2, size[1]-(button_height/2)))
-        screen.blit(win_text, text_rect)
-
+        screen.blit(error_text, text_rect)
+        pygame.draw.line(screen, BLACK, [0, info_height], [
+                         size[0], info_height])
+        screen.blit(info_text, info_rect)
         pygame.draw.rect(
             screen, BLACK, [0, size[1]-button_height, size[0], size[1]], width=3)
         pygame.display.flip()
