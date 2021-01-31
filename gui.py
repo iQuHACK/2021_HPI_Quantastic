@@ -18,10 +18,13 @@ def loop(cells, num_stars):
     width = len(cells)
 
     marked_cells = [[0]*width for _ in range(width)]
+    solution = [[0]*width for _ in range(width)]
+
     # Define some colors
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
     YELLOW = (255, 255, 0)
+    GREEN = (0, 255, 0)
 
     button_height = 200
 
@@ -31,6 +34,7 @@ def loop(cells, num_stars):
     carryOn = True
     sysfont = pygame.font.get_default_font()
     font = pygame.font.SysFont(sysfont, round(size[0]/22.5))
+    showSolution = False
     # The clock will be used to control how fast the screen updates
     clock = pygame.time.Clock()
     # -------- Main Program Loop -----------
@@ -59,15 +63,24 @@ def loop(cells, num_stars):
                 else:
                     text = font.render(error, True, BLACK)
         if q.qsize() > 0:
-            print("solution available, it's", q.get())
+            solution = q.get()
+            showSolution = True
+            print("solution available, it's", solution)
         screen.fill(WHITE)
         start_y = 0
         for y, row in enumerate(cells):
             start_x = 0
             for x, cell in enumerate(row):
-                if marked_cells[y][x] == 1:
-                    pygame.draw.rect(screen, YELLOW, [
+                if showSolution and solution[y][x] == 1:
+                    pygame.draw.rect(screen, GREEN, [
                                      start_x, start_y, delta_x, delta_y])
+
+                if marked_cells[y][x] == 1:
+                    font1 = pygame.font.SysFont(sysfont, round(size[0]/7))
+                    text1 = font1.render("+", True, BLACK)
+                    text_rect = text1.get_rect(center=(start_x + (delta_x/2), start_y + (delta_y/2)))
+                    screen.blit(text1, text_rect)
+                    
                 if y >= 1:
                     pygame.draw.line(screen, BLACK, [start_x, start_y],
                                      [start_x + delta_x, start_y], 2 if cells[y-1][x] == cells[y][x] else 5)
