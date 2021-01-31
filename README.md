@@ -3,9 +3,9 @@
 You can find our project presentation slides [here](iquhack2021_hpi_quantastic.pdf). 
 
 ## About the game
-This repository implements the popular game created by [Krazydad](https://krazydad.com/twonottouch/) and solves it using D-Wave's Quantum Annealing. We use the [Ocean SDK](https://docs.ocean.dwavesys.com/en/stable/) provided by D-Wave.
+This repository implements the popular game Star Battle / Two Not Touch created by [Krazydad](https://krazydad.com/twonottouch/) and solves it using D-Wave's Quantum Annealing. We use the [Ocean SDK](https://docs.ocean.dwavesys.com/en/stable/) provided by D-Wave.
 
-To get a feel for the game, you can try it out online [https://www.puzzle-star-battle.com/](here).
+To get a feel for the game, you can try it out online at [https://www.puzzle-star-battle.com/](here).
 
 ## Goals
 The project should educate players on the power of quantum computing. While human players try one combination after the other, the quantum computer tries all combinations at the same time. This approach is also vastly different from classical computers which take a long time to solve this kind of puzzle.
